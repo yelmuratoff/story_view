@@ -445,6 +445,9 @@ class StoryView extends StatefulWidget {
   final List<Widget> topLayerStackWidgets;
 
   ///
+  final Widget? lastPageLayerStackWidget;
+
+  ///
   const StoryView({
     required this.storyItems,
     required this.controller,
@@ -463,6 +466,7 @@ class StoryView extends StatefulWidget {
     ),
     this.backgroundColor = Colors.white,
     this.topLayerStackWidgets = const [],
+    this.lastPageLayerStackWidget,
   });
 
   @override
@@ -753,6 +757,9 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
             ),
           ),
           if (widget.topLayerStackWidgets.isNotEmpty) ...widget.topLayerStackWidgets,
+          if (widget.lastPageLayerStackWidget != null &&
+              widget.storyItems.firstWhereOrNull((it) => it?.shown == false) == widget.storyItems.last)
+            widget.lastPageLayerStackWidget!,
         ],
       ),
     );
