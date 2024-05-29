@@ -1,6 +1,19 @@
 import 'package:rxdart/rxdart.dart';
 
-enum PlaybackState { pause, play, next, previous }
+/// Enum to represent the different states of playback for the stories.
+enum PlaybackState {
+  /// State when the playback is paused.
+  pause,
+
+  /// State when the playback is playing.
+  play,
+
+  /// State when moving to the next story.
+  next,
+
+  /// State when moving to the previous story.
+  previous,
+}
 
 /// Controller to sync playback between animated child (story) views. This
 /// helps make sure when stories are paused, the animation (gifs/slides) are
@@ -21,10 +34,12 @@ class StoryController {
     playbackNotifier.add(PlaybackState.play);
   }
 
+  /// Notify listeners with a [PlaybackState.next] state to move to the next story.
   void next() {
     playbackNotifier.add(PlaybackState.next);
   }
 
+  /// Notify listeners with a [PlaybackState.previous] state to move to the previous story.
   void previous() {
     playbackNotifier.add(PlaybackState.previous);
   }

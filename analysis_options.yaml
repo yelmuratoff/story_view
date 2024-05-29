@@ -1,0 +1,13 @@
+# include: package:flutter_lints/flutter.yaml
+include: package:lint/analysis_options.yaml
+
+linter:
+  rules:
+    - public_member_api_docs
+analyzer:
+  exclude:
+    - example/**
+    - test/**
+    - "**/*.g.dart"
+    - "**/*.gr.dart"
+    - "**/*.freezed.dart"
