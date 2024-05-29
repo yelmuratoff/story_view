@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../controller/story_controller.dart';
 import '../utils.dart';
@@ -442,6 +441,9 @@ class StoryView extends StatefulWidget {
   /// background color
   final Color backgroundColor;
 
+  /// Top layer stack widgets
+  final List<Widget> topLayerStackWidgets;
+
   ///
   const StoryView({
     required this.storyItems,
@@ -460,6 +462,7 @@ class StoryView extends StatefulWidget {
       vertical: 8,
     ),
     this.backgroundColor = Colors.white,
+    this.topLayerStackWidgets = const [],
   });
 
   @override
@@ -685,74 +688,71 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               ),
             ),
           ),
-          IgnorePointer(
-            child: Align(
-              alignment: Alignment.centerRight,
-              heightFactor: 1,
-              child: GestureDetector(
-                onTapDown: (details) {
-                  widget.controller.pause();
-                },
-                onTapCancel: () {
+          Align(
+            alignment: Alignment.centerRight,
+            heightFactor: 1,
+            child: GestureDetector(
+              onTapDown: (details) {
+                widget.controller.pause();
+              },
+              onTapCancel: () {
+                widget.controller.play();
+              },
+              onTapUp: (details) {
+                // if debounce timed out (not active) then continue anim
+                if (_nextDebouncer?.isActive == false) {
                   widget.controller.play();
+                } else {
+                  widget.controller.next();
+                }
+              },
+              onVerticalDragStart: widget.onVerticalSwipeComplete == null
+                  ? null
+                  : (details) {
+                      widget.controller.pause();
+                    },
+              onVerticalDragCancel: widget.onVerticalSwipeComplete == null
+                  ? null
+                  : () {
+                      widget.controller.play();
+                    },
+              onVerticalDragUpdate: widget.onVerticalSwipeComplete == null
+                  ? null
+                  : (details) {
+                      verticalDragInfo ??= VerticalDragInfo();
+
+                      verticalDragInfo!.update(details.primaryDelta!);
+
+                      // TODO: provide callback interface for animation purposes
+                    },
+              onVerticalDragEnd: widget.onVerticalSwipeComplete == null
+                  ? null
+                  : (details) {
+                      widget.controller.play();
+                      // finish up drag cycle
+                      if (!verticalDragInfo!.cancel && widget.onVerticalSwipeComplete != null) {
+                        widget.onVerticalSwipeComplete!(
+                          verticalDragInfo!.direction,
+                        );
+                      }
+
+                      verticalDragInfo = null;
+                    },
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            heightFactor: 1,
+            child: SizedBox(
+              width: 70,
+              child: GestureDetector(
+                onTap: () {
+                  widget.controller.previous();
                 },
-                onTapUp: (details) {
-                  // if debounce timed out (not active) then continue anim
-                  if (_nextDebouncer?.isActive == false) {
-                    widget.controller.play();
-                  } else {
-                    widget.controller.next();
-                  }
-                },
-                onVerticalDragStart: widget.onVerticalSwipeComplete == null
-                    ? null
-                    : (details) {
-                        widget.controller.pause();
-                      },
-                onVerticalDragCancel: widget.onVerticalSwipeComplete == null
-                    ? null
-                    : () {
-                        widget.controller.play();
-                      },
-                onVerticalDragUpdate: widget.onVerticalSwipeComplete == null
-                    ? null
-                    : (details) {
-                        verticalDragInfo ??= VerticalDragInfo();
-            
-                        verticalDragInfo!.update(details.primaryDelta!);
-            
-                        // TODO: provide callback interface for animation purposes
-                      },
-                onVerticalDragEnd: widget.onVerticalSwipeComplete == null
-                    ? null
-                    : (details) {
-                        widget.controller.play();
-                        // finish up drag cycle
-                        if (!verticalDragInfo!.cancel && widget.onVerticalSwipeComplete != null) {
-                          widget.onVerticalSwipeComplete!(
-                            verticalDragInfo!.direction,
-                          );
-                        }
-            
-                        verticalDragInfo = null;
-                      },
               ),
             ),
           ),
-          IgnorePointer(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              heightFactor: 1,
-              child: SizedBox(
-                width: 70,
-                child: GestureDetector(
-                  onTap: () {
-                    widget.controller.previous();
-                  },
-                ),
-              ),
-            ),
-          ),
+          if (widget.topLayerStackWidgets.isNotEmpty) ...widget.topLayerStackWidgets,
         ],
       ),
     );
