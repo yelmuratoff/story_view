@@ -1,12 +1,13 @@
+// ignore_for_file: prefer_constructors_over_static_methods
+
 import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:story_view/controller/story_controller.dart';
+import 'package:story_view/utils.dart';
 import 'package:video_player/video_player.dart';
-
-import '../controller/story_controller.dart';
-import '../utils.dart';
 
 ///
 class VideoLoader {

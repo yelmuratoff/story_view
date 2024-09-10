@@ -1,13 +1,15 @@
+// ignore_for_file: avoid_bool_literals_in_conditional_expressions, prefer_constructors_over_static_methods, avoid_classes_with_only_static_members
+
 import 'dart:async';
 import 'dart:math';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 
-import '../controller/story_controller.dart';
-import '../utils.dart';
-import 'story_image.dart';
-import 'story_video.dart';
+import 'package:story_view/controller/story_controller.dart';
+import 'package:story_view/utils.dart';
+import 'package:story_view/widgets/story_image.dart';
+import 'package:story_view/widgets/story_video.dart';
 
 /// Enum to indicate where the progress indicators should be placed.
 enum ProgressPosition {
@@ -412,6 +414,12 @@ class StoryView extends StatefulWidget {
   /// Callback for when a story and it index is currently being shown.
   final void Function(StoryItem storyItem, int index)? onStoryShow;
 
+  /// Callback for when the next page is tapped.
+  final void Function(StoryItem storyItem, int index)? onTapNext;
+
+  /// Callback for when the previous page is tapped.
+  final void Function(StoryItem storyItem, int index, bool isHasPreviousStories)? onTapPrevious;
+
   /// Where the progress indicator should be placed.
   final ProgressPosition progressPosition;
 
@@ -467,6 +475,8 @@ class StoryView extends StatefulWidget {
     this.backgroundColor = Colors.white,
     this.topLayerStackWidgets = const [],
     this.lastPageLayerStackWidget,
+    this.onTapNext,
+    this.onTapPrevious,
   });
 
   @override
@@ -635,11 +645,11 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       _animationController!.stop();
 
       // get last showing
-      final _last = _currentStory;
+      final last = _currentStory;
 
-      if (_last != null) {
-        _last.shown = true;
-        if (_last != widget.storyItems.last) {
+      if (last != null) {
+        last.shown = true;
+        if (last != widget.storyItems.last) {
           _beginPlay();
         }
       }
@@ -707,6 +717,9 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 if (_nextDebouncer?.isActive == false) {
                   widget.controller.play();
                 } else {
+                  if (_currentStory != null) {
+                    widget.onTapNext?.call(_currentStory!, widget.storyItems.indexOf(_currentStory));
+                  }
                   widget.controller.next();
                 }
               },
@@ -751,6 +764,13 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               width: 70,
               child: GestureDetector(
                 onTap: () {
+                  if (_currentStory != null) {
+                    widget.onTapPrevious?.call(
+                      _currentStory!,
+                      widget.storyItems.indexOf(_currentStory),
+                      widget.storyItems.indexOf(_currentStory) > 0,
+                    );
+                  }
                   widget.controller.previous();
                 },
               ),
