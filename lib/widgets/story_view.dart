@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_bool_literals_in_conditional_expressions, prefer_constructors_over_static_methods, avoid_classes_with_only_static_members
 
 import 'dart:async';
-import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:collection/collection.dart' show IterableExtension;
@@ -757,7 +756,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                   ? null
                   : (details) {
                       horizontalDragInfo ??= HorizontalDragInfo();
-                      log('Horizontal Drag Update: ${details.primaryDelta}');
                       horizontalDragInfo!.update(details.primaryDelta!);
                     },
               onVerticalDragEnd: widget.onVerticalSwipeComplete == null
