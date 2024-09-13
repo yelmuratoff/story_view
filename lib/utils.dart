@@ -56,3 +56,29 @@ class VerticalDragInfo {
     direction = tmpDirection;
   }
 }
+
+/// Class to handle information about horizontal drag events.
+class HorizontalDragInfo {
+  /// Indicates if the drag event should be canceled.
+  bool cancel = false;
+
+  /// The direction of the drag event.
+  Direction? direction;
+
+  /// Updates the direction of the drag event based on the primaryDelta.
+  void update(double primaryDelta) {
+    Direction tmpDirection;
+
+    if (primaryDelta > 0) {
+      tmpDirection = Direction.right;
+    } else {
+      tmpDirection = Direction.left;
+    }
+
+    if (direction != null && tmpDirection != direction) {
+      cancel = true;
+    }
+
+    direction = tmpDirection;
+  }
+}

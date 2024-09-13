@@ -411,6 +411,12 @@ class StoryView extends StatefulWidget {
   /// provide this callback so as to enable scroll events on the list view.
   final Function(Direction?)? onVerticalSwipeComplete;
 
+  /// Callback for when a horizontal swipe gesture is detected. If you do not
+  /// want to listen to such event, do not provide it.
+  /// This is useful for paginating the story items.
+  /// The [Direction] parameter will be either [Direction.left] or [Direction.right].
+  final Function(Direction?)? onHorizontalSwipeComplete;
+
   /// Callback for when a story and it index is currently being shown.
   final void Function(StoryItem storyItem, int index)? onStoryShow;
 
@@ -465,6 +471,7 @@ class StoryView extends StatefulWidget {
     this.repeat = false,
     this.inline = false,
     this.onVerticalSwipeComplete,
+    this.onHorizontalSwipeComplete,
     this.indicatorColor,
     this.indicatorForegroundColor,
     this.indicatorHeight = IndicatorHeight.large,
@@ -495,6 +502,9 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
   ///
   VerticalDragInfo? verticalDragInfo;
+
+  ///
+  HorizontalDragInfo? horizontalDragInfo;
 
   StoryItem? get _currentStory {
     return widget.storyItems.firstWhereOrNull((it) => !it!.shown);
@@ -742,6 +752,13 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
                       // TODO: provide callback interface for animation purposes
                     },
+              onHorizontalDragUpdate: widget.onHorizontalSwipeComplete == null
+                  ? null
+                  : (details) {
+                      horizontalDragInfo ??= HorizontalDragInfo();
+
+                      horizontalDragInfo!.update(details.primaryDelta!);
+                    },
               onVerticalDragEnd: widget.onVerticalSwipeComplete == null
                   ? null
                   : (details) {
@@ -754,6 +771,19 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                       }
 
                       verticalDragInfo = null;
+                    },
+              onHorizontalDragEnd: widget.onHorizontalSwipeComplete == null || horizontalDragInfo == null
+                  ? null
+                  : (details) {
+                      widget.controller.play();
+                      // finish up drag cycle
+                      if (!horizontalDragInfo!.cancel && widget.onHorizontalSwipeComplete != null) {
+                        widget.onHorizontalSwipeComplete!(
+                          horizontalDragInfo!.direction,
+                        );
+                      }
+
+                      horizontalDragInfo = null;
                     },
             ),
           ),
