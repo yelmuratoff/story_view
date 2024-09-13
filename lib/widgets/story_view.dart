@@ -1,7 +1,8 @@
 // ignore_for_file: avoid_bool_literals_in_conditional_expressions, prefer_constructors_over_static_methods, avoid_classes_with_only_static_members
 
 import 'dart:async';
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -756,7 +757,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                   ? null
                   : (details) {
                       horizontalDragInfo ??= HorizontalDragInfo();
-
+                      log('Horizontal Drag Update: ${details.primaryDelta}');
                       horizontalDragInfo!.update(details.primaryDelta!);
                     },
               onVerticalDragEnd: widget.onVerticalSwipeComplete == null
@@ -772,18 +773,16 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
                       verticalDragInfo = null;
                     },
-              onHorizontalDragEnd: widget.onHorizontalSwipeComplete == null || horizontalDragInfo == null
+              onHorizontalDragEnd: widget.onHorizontalSwipeComplete == null
                   ? null
                   : (details) {
-                      widget.controller.play();
                       // finish up drag cycle
-                      if (!horizontalDragInfo!.cancel && widget.onHorizontalSwipeComplete != null) {
+                      if (widget.onHorizontalSwipeComplete != null) {
+                        // ignore: prefer_null_aware_method_calls
                         widget.onHorizontalSwipeComplete!(
                           horizontalDragInfo!.direction,
                         );
                       }
-
-                      horizontalDragInfo = null;
                     },
             ),
           ),
@@ -995,7 +994,7 @@ class _ContrastHelper {
   static double luminance(int? r, int? g, int? b) {
     final a = [r, g, b].map((it) {
       final double value = it!.toDouble() / 255.0;
-      return value <= 0.03928 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4);
+      return value <= 0.03928 ? value / 12.92 : math.pow((value + 0.055) / 1.055, 2.4);
     }).toList();
 
     return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
