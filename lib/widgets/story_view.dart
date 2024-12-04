@@ -55,11 +55,15 @@ class StoryItem {
   /// The page content
   final Widget view;
 
+  /// An overlay widget to be displayed on top of the page content.
+  final Widget? overlay;
+
   ///
   StoryItem(
     this.view, {
     required this.duration,
     this.shown = false,
+    this.overlay,
   });
 
   /// Short hand to create text-only page.
@@ -80,6 +84,7 @@ class StoryItem {
     bool roundedBottom = false,
     EdgeInsetsGeometry? textOuterPadding,
     Duration? duration,
+    Widget? overlay,
   }) {
     final double contrast = _ContrastHelper.contrast([
       backgroundColor.red,
@@ -122,6 +127,7 @@ class StoryItem {
         //color: backgroundColor,
       ),
       shown: shown,
+      overlay: overlay,
       duration: duration ?? const Duration(seconds: 3),
     );
   }
@@ -140,6 +146,7 @@ class StoryItem {
     Widget? errorWidget,
     EdgeInsetsGeometry? captionOuterPadding,
     Duration? duration,
+    Widget? overlay,
   }) {
     return StoryItem(
       ColoredBox(
@@ -177,6 +184,7 @@ class StoryItem {
         ),
       ),
       shown: shown,
+      overlay: overlay,
       duration: duration ?? const Duration(seconds: 3),
     );
   }
@@ -197,6 +205,7 @@ class StoryItem {
     Widget? errorWidget,
     EdgeInsetsGeometry? captionOuterPadding,
     Duration? duration,
+    Widget? overlay,
   }) {
     return StoryItem(
       ClipRRect(
@@ -236,6 +245,7 @@ class StoryItem {
         ),
       ),
       shown: shown,
+      overlay: overlay,
       duration: duration ?? const Duration(seconds: 3),
     );
   }
@@ -252,6 +262,7 @@ class StoryItem {
     Map<String, dynamic>? requestHeaders,
     Widget? loadingWidget,
     Widget? errorWidget,
+    Widget? overlay,
   }) {
     return StoryItem(
       ColoredBox(
@@ -282,6 +293,7 @@ class StoryItem {
         ),
       ),
       shown: shown,
+      overlay: overlay,
       duration: duration ?? const Duration(seconds: 10),
     );
   }
@@ -296,6 +308,7 @@ class StoryItem {
     String? caption,
     bool shown = false,
     Duration? duration,
+    Widget? overlay,
   }) {
     return StoryItem(
       ColoredBox(
@@ -341,6 +354,7 @@ class StoryItem {
         ),
       ),
       shown: shown,
+      overlay: overlay,
       duration: duration ?? const Duration(seconds: 3),
     );
   }
@@ -356,6 +370,7 @@ class StoryItem {
     bool roundedTop = true,
     bool roundedBottom = false,
     Duration? duration,
+    Widget? overlay,
   }) {
     return StoryItem(
       Container(
@@ -389,6 +404,7 @@ class StoryItem {
         ),
       ),
       shown: shown,
+      overlay: overlay,
       duration: duration ?? const Duration(seconds: 3),
     );
   }
@@ -513,7 +529,13 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   Widget get _currentView {
     var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
     item ??= widget.storyItems.last;
-    return item?.view ?? Container();
+    return item?.view ?? const SizedBox.shrink();
+  }
+
+  Widget get _currentOverlay {
+    var item = widget.storyItems.firstWhereOrNull((it) => !it!.shown);
+    item ??= widget.storyItems.last;
+    return item?.overlay ?? const SizedBox.shrink();
   }
 
   @override
@@ -807,6 +829,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
           if (widget.lastPageLayerStackWidget != null &&
               widget.storyItems.firstWhereOrNull((it) => it?.shown == false) == widget.storyItems.last)
             widget.lastPageLayerStackWidget!,
+          _currentOverlay,
         ],
       ),
     );

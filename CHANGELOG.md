@@ -1,3 +1,6 @@
+## [0.17.0] - 04 Dec 2024
+- Added `overlay` property to `StoryItem` to allow for custom overlay widgets.
+
 ## [0.16.5] - 18 Feb 2024
 - Bump dependencies to latest
 - Added medium to Indicator Height
